@@ -1,0 +1,60 @@
+﻿@model CreatedMeetWebUI.Models.MEET
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn3.devexpress.com/aspnet/20.2.8/css/dx.light.css" />
+
+<!-- DevExpress Scripts -->
+<script src="https://cdn3.devexpress.com/aspnet/20.2.8/js/dx.all.js"></script>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+
+<!-- DevExpress Layout Control -->
+<dx:ASPxLayoutControl runat="server">
+    <Items>
+        <dx:LayoutItem Caption="ID">
+            @Html.DisplayFor(model => model.ID)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Purpose">
+            @Html.DisplayFor(model => model.PURPOSE)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Earnings">
+            @Html.DisplayFor(model => model.EARNINGS)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Title">
+            @Html.DisplayFor(model => model.TITLE)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Start Time">
+            @Html.DisplayFor(model => model.START_TIME)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="End Time">
+            @Html.DisplayFor(model => model.END_TIME)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Location">
+            @Html.DisplayFor(model => model.LOCATION)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Agenda">
+            @Html.DisplayFor(model => model.AGENDA)
+        </dx:LayoutItem>
+        <dx:LayoutItem Caption="Actions">
+            <div>
+                <form asp-action="Delete" method="post">
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </form>
+            </div>
+        </dx:LayoutItem>
+    </Items>
+</dx:ASPxLayoutControl>
+
+<!-- DevExpress JavaScript Initialization -->
+<script>
+    $(function () {
+        DevExpress.ui.setCulture("en");
+    });
+</script>

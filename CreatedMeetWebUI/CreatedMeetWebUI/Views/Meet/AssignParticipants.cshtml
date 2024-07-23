@@ -1,0 +1,153 @@
+﻿@model CreatedMeetWebUI.Models.MeetingViewModel
+
+@{
+    ViewData["Title"] = "AssignParticipants";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    DateTime start = Model.Meeting.START_TIME;
+    string StartedDateTime = $"Tarih: {start:yyyy-MM-dd}, Saat: {start:HH:mm:ss}";
+    DateTime end = Model.Meeting.END_TIME;
+    string EndDateTime = $"Tarih: {end:yyyy-MM-dd}, Saat: {end:HH:mm:ss}";
+
+}
+<style>
+    .custom-checkbox {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .custom-true .dx-datagrid-text-content {
+        color: black !important;
+    }
+
+    .custom-false .dx-datagrid-text-content {
+        color: red !important;
+    }
+</style>
+<link rel="stylesheet" href="https://cdn3.devexpress.com/aspnet/20.2.8/css/dx.light.css" />
+
+<!-- DevExpress Scripts -->
+<script src="https://cdn3.devexpress.com/aspnet/20.2.8/js/dx.all.js"></script>
+
+<h1>Toplantı Atamaları </h1>
+<form method="post" action="AssignParticipants">
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Toplamtı Bilgileri</h5>
+
+                <!-- Default List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">Toplatı Başlığı:@Model.Meeting.TITLE</li>
+                    <li class="list-group-item">Toplantı Amaçı:@Model.Meeting.EARNINGS</li>
+                    <li class="list-group-item">Toplantı Gündemi:@Model.Meeting.AGENDA</li>
+                    
+
+                </ul><!-- End Default List group -->
+
+            </div>
+        </div>
+
+      
+
+    </div>
+    <div class="col-lg-6">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Zaman Bigileri</h5>
+
+                <!-- Default List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">Toplantı Zamanı:@StartedDateTime</li>
+                    <li class="list-group-item">Öngörülen Bitiş Zamanı:</li>
+                    
+
+                </ul><!-- End Default List group -->
+
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <button class="btn btn-primary" type="submit" asp-action="/Meet/AssignParticipants">Atamayı Kaydet</button>
+        </div>
+    </div>
+   
+
+</div>
+<!-- Toplantı Bilgileri -->
+
+
+<hr />
+
+@(
+Html.DevExtreme().DataGrid<USER>()
+                .ID("gridContainer")
+                .DataSource(d => d.Mvc()
+                    .Controller("User")
+                    .LoadAction("Get")
+                    .InsertAction("Create")
+                    .UpdateAction("Update")
+                     .DeleteAction("Delete")
+                    .Key("ID")
+                )
+                .Columns(columns =>
+                {
+                    columns.AddFor(m => m.ID).Caption("KullanıcıKod").Width(50).Visible(false);
+                    columns.AddFor(m => m.NAME).Caption("Personel Adı");
+                    columns.AddFor(m => m.SURNAME).Caption("Personel Soyadı");
+                    columns.AddFor(m => m.EMAIL).Caption("Email Adresi").DataType(GridColumnDataType.String);
+                    columns.AddFor(m => m.PHONENUMBER).Caption("Telefon Numarası").DataType(GridColumnDataType.String);
+                    columns.AddFor(m => m.JOINMEET)
+                    .Caption("Katılım Durumu")
+                    .DataType(GridColumnDataType.Boolean)
+                    .CellTemplate(@<text>
+    <div class="custom-checkbox">
+        <input type="checkbox" class="joinmeet-checkbox" />
+    </div>
+                    </text>);
+
+
+
+
+                })
+    .Paging(p => p.PageSize(10))
+    .Editing(e => e.Mode(GridEditMode.Popup).Popup(p => p.Title("Edit MEET")))
+    .FilterRow(f => f.Visible(true))
+    .HeaderFilter(f => f.Visible(true))
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(false))
+    .RemoteOperations(true)
+    .Summary(s => s
+        .TotalItems(totalItems =>
+        {
+            totalItems.AddFor(m => m.ID).SummaryType(SummaryType.Count).DisplayFormat("Total: {0}");
+        })
+        .GroupItems(groupItems =>
+        {
+            groupItems.Add().SummaryType(SummaryType.Count).ShowInGroupFooter(true);
+        })
+    )
+)
+</form>
+<script>
+    $(function () {
+        $("#gridContainer").dxDataGrid("instance").on("contentReady", function () {
+            $(".joinmeet-checkbox").each(function () {
+                $(this).dxCheckBox({
+                    value: $(this).closest("td").data("value"), 
+                    onValueChanged: function (e) {                      
+                        var grid = $("#gridContainer").dxDataGrid("instance");
+                        var rowIndex = $(e.element).closest("tr").index();
+                        grid.cellValue(rowIndex, "JOINMEET", e.value);
+                    }
+                });
+            });
+        });
+    });
+    $(function () {
+        DevExpress.ui.setCulture("en");
+    });
+</script>

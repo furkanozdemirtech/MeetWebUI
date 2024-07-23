@@ -1,0 +1,66 @@
+﻿@using DevExtreme.AspNet.Mvc;
+@model USER
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdn3.devexpress.com/jslib/21.1.3/css/dx.light.css" rel="stylesheet" />
+}
+
+<h1>Create User</h1>
+
+<form id="userForm" method="post">
+    @Html.AntiForgeryToken()
+
+    @(Html.DevExtreme().Form<USER>()
+        .ID("userForm")
+        .ColCount(2)
+        .LabelLocation(FormLabelLocation.Top)
+        .Items(items =>
+        {
+            items.AddSimpleFor(m => m.EMAIL);
+            items.AddSimpleFor(m => m.EMAILCONFIRMED);
+            items.AddSimpleFor(m => m.SECURRITYSTAMP);
+            items.AddSimpleFor(m => m.PHONENUMBER);
+            items.AddSimpleFor(m => m.NUMBERCONFIRMED);
+            items.AddSimpleFor(m => m.USERNAME);
+            items.AddSimpleFor(m => m.NAME);
+            items.AddSimpleFor(m => m.SURNAME);
+            items.AddSimpleFor(m => m.PASSWORD);
+        })
+        )
+
+    
+</form>
+<div class="form-group">
+    <button type="submit" id="submitButton" class="btn btn-primary">Create</button>
+</div>
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $("#submitButton").on("click", function (event) {
+                event.preventDefault();
+                var formData = $("#userForm").dxForm("instance").option("formData");
+
+                $.ajax({
+                    url: "@Url.Action("Insert", "User")",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(formData),
+                    success: function (result) {
+                        alert("User created successfully");
+                        window.location.href = "@Url.Action("Index", "User")";
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Failed to create user: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,81 @@
+@using CreatedMeetWebUI.Models
+@using DevExtreme.AspNet.Mvc;
+
+<h2>Home</h2>
+
+@(Html.DevExtreme().DataGrid<MEET>()
+    .ID("gridContainer")
+    .DataSource(d => d.Mvc()
+        .Controller("Meet")
+        .LoadAction("Get")
+        .InsertAction("Create")
+        .UpdateAction("Update")
+         .DeleteAction("Delete")
+        .Key("ID")
+    )
+    .Columns(columns =>
+    {
+        columns.AddFor(m => m.ID).Caption("ID").Width(50);
+        columns.AddFor(m => m.PURPOSE).Caption("Purpose");
+        columns.AddFor(m => m.EARNINGS).Caption("Earnings");
+        columns.AddFor(m => m.TITLE).Caption("Title");
+        columns.AddFor(m => m.START_TIME).Caption("Start Time").DataType(GridColumnDataType.DateTime).Format("yyyy-MM-dd HH:mm");
+        columns.AddFor(m => m.END_TIME).Caption("End Time").DataType(GridColumnDataType.DateTime).Format("yyyy-MM-dd HH:mm");
+        columns.AddFor(m => m.LOCATION).Caption("Location");
+        columns.AddFor(m => m.AGENDA).Caption("Agenda");
+        columns.Add().Width(100).CellTemplate(@<text>
+    <form action="/Meet/Delete" method="get" style="display:inline;">
+        <input type="hidden" name="id" value="<%= data.ID %>" />
+        <button type="submit" class="btn btn-danger btn-sm">
+            Delete
+        </button>
+    </form>
+    
+</text>).Caption("");
+    })
+    .Paging(p => p.PageSize(10))
+    .Editing(e => e.Mode(GridEditMode.Popup).Popup(p => p.Title("Edit MEET")))
+    .FilterRow(f => f.Visible(true))
+    .HeaderFilter(f => f.Visible(true))
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(false))
+    .RemoteOperations(true)
+    .Summary(s => s
+        .TotalItems(totalItems =>
+        {
+            totalItems.AddFor(m => m.ID).SummaryType(SummaryType.Count).DisplayFormat("Total: {0}");
+        })
+        .GroupItems(groupItems =>
+        {
+            groupItems.Add().SummaryType(SummaryType.Count).ShowInGroupFooter(true);
+        })
+    )
+)
+
+@section Scripts {
+    <script>
+        $(document).on('click', '.delete-btn', function (event) {           
+            event.preventDefault();
+            var rowId = $(this).data('id');
+            var href = $(this).attr('href');
+            var rowId = href.split('/').pop();
+            var url = '/Meet/Remove/' + rowId;
+            alert(url);
+           
+            $.ajax({               
+                url: url,
+                type: 'POST',
+                data = { id: rowId },
+                dataType:'JSON'
+                success: function (response) {
+                    
+                    $("#gridContainer").dxDataGrid("instance").refresh();
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + error);
+                }
+                
+            });
+        });
+    </script>
+}

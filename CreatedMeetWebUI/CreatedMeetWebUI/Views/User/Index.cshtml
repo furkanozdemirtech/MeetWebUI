@@ -1,0 +1,59 @@
+﻿@using CreatedMeetWebUI.Models
+@using DevExtreme.AspNet.Mvc;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+@(Html.DevExtreme().DataGrid<USER>()
+    .ID("gridContainer")
+    .DataSource(d => d.Mvc()
+        .Controller("User")
+        .LoadAction("Get")
+        .InsertAction("Create")
+        .UpdateAction("Update")
+         .DeleteAction("Delete")
+        .Key("ID")
+    )
+    .Columns(columns =>
+    {
+        columns.AddFor(m => m.ID).Caption("ID").Width(50);
+        columns.AddFor(m => m.NAME).Caption("NAME");
+        columns.AddFor(m => m.SURNAME).Caption("SURNAME");
+        columns.AddFor(m => m.USERNAME).Caption("USERNAME");
+        columns.AddFor(m => m.EMAIL).Caption("EMAIL").DataType(GridColumnDataType.String);
+        columns.AddFor(m => m.EMAILCONFIRMED).Caption("EMAILCONFIRMED").DataType(GridColumnDataType.Boolean);
+        columns.AddFor(m => m.PHONENUMBER).Caption("PHONENUMBER").DataType(GridColumnDataType.String);
+        columns.AddFor(m => m.NUMBERCONFIRMED).Caption("NUMBERCONFIRMED").DataType(GridColumnDataType.Boolean);
+        columns.AddFor(m => m.SECURRITYSTAMP).Caption("SECURRITYSTAMP");
+        columns.Add().Width(100).CellTemplate(@<text>
+    <form action="/User/Delete" method="get" style="display:inline;">
+        <input type="hidden" name="id" value="<%= data.ID %>" />
+        <button type="submit" class="btn btn-danger btn-sm">
+            Delete
+        </button>
+    </form>
+
+</text>).Caption("");
+    })
+    .Paging(p => p.PageSize(10))
+    .Editing(e => e.Mode(GridEditMode.Popup).Popup(p => p.Title("Edit MEET")))
+    .FilterRow(f => f.Visible(true))
+    .HeaderFilter(f => f.Visible(true))
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(false))
+    .RemoteOperations(true)
+    .Summary(s => s
+        .TotalItems(totalItems =>
+        {
+            totalItems.AddFor(m => m.ID).SummaryType(SummaryType.Count).DisplayFormat("Total: {0}");
+        })
+        .GroupItems(groupItems =>
+        {
+            groupItems.Add().SummaryType(SummaryType.Count).ShowInGroupFooter(true);
+        })
+    )
+)

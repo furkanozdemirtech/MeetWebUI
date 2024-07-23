@@ -1,0 +1,89 @@
+﻿@using DevExtreme.AspNet.Mvc;
+
+@model MEET
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdn3.devexpress.com/jslib/21.1.3/css/dx.light.css" rel="stylesheet" />
+}
+
+<h2>Create Meet</h2>
+
+<form id="meetForm" >
+    @Html.AntiForgeryToken()
+
+    @(
+        Html.DevExtreme().Form<MEET>()
+                    .ID("meetForm")
+                    .ColCount(2)
+                    .LabelLocation(FormLabelLocation.Top)
+                    .Items(items =>
+                    {
+                        items.AddSimpleFor(m => m.PURPOSE).Label(x=>x.Text("Amaç"));
+                        items.AddSimpleFor(m => m.EARNINGS).Label(x => x.Text("Kazanımlar"));
+                        items.AddSimpleFor(m => m.TITLE).Label(x => x.Text("Başlık"));
+                        items.AddSimpleFor(m => m.START_TIME).Template(@<text>
+                        <div id="START_TIME" class="date-box"></div>
+                        </text>);
+                        items.AddSimpleFor(m => m.END_TIME).Template(@<text>
+                        <div id="END_TIME" class="date-box"></div>
+                        </text>);
+                    items.AddSimpleFor(m => m.LOCATION);
+                    items.AddSimpleFor(m => m.AGENDA);
+        })
+        )
+
+    
+</form>
+<div class="form-group">
+    <button type="submit" id="submitButton" class="btn btn-primary">Create</button>
+</div>
+@section Scripts {
+    
+    <script>
+        $(document).ready(function () {
+            $("#START_TIME").dxDateBox({
+                type: "datetime",
+                displayFormat: "dd.MM.yyyy HH:mm",
+                value: new Date()
+            });
+
+            // Initialize DateBox for END_TIME
+            $("#END_TIME").dxDateBox({
+                type: "datetime",
+                displayFormat: "dd.MM.yyyy HH:mm",
+                value: new Date()
+            });
+
+            // Handle the change event
+            $("#START_TIME").dxDateBox("instance").on("valueChanged", function (e) {
+                console.log("Start Time Changed:", e.value);
+            });
+
+            $("#END_TIME").dxDateBox("instance").on("valueChanged", function (e) {
+                console.log("End Time Changed:", e.value);
+            });
+            $("#submitButton").on("click", function () {
+                var formData = $("#meetForm").dxForm("instance").option("formData");
+
+                $.ajax({
+                    url: "@Url.Action("Create", "Meet")",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(formData),
+                    success: function (result) {
+                        alert("Meet created successfully");
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Failed to create meet: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+}
